@@ -1,0 +1,26 @@
+version: '2.2'
+
+services:
+  jobmanager:
+    build:
+      context: .
+    image: async-http-test
+    ports:
+      - "8081:8081"
+    command: standalone-job --job-classname dev.caarlos0.StreamingJob
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        parallelism.default: 1
+  taskmanager:
+    image: async-http-test
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 20
+        parallelism.default: 1
