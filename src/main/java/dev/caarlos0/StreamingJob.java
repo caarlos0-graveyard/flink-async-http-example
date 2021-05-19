@@ -139,10 +139,15 @@ public class StreamingJob {
                                 }
                               }
                             })
-                        .thenAccept(
-                            status -> {
-                              resultFuture.complete(Collections.singleton(status));
-                              LOG.info("future completed: {} / {}", s, status);
+                        .whenCompleteAsync(
+                            (status, ex) -> {
+                              if (ex == null) {
+                                resultFuture.complete(Collections.singleton(status));
+                                LOG.info("future completed: {} / {}", s, status);
+                              } else {
+                                resultFuture.completeExceptionally(ex);
+                                LOG.error("future completed: {}", s, ex);
+                              }
                             });
                   }
                 },
